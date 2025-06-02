@@ -13,15 +13,17 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <div className="menu">
-        <Link to="/" className={`menu-item ${location.pathname === '/' ? 'active' : ''}`}>
+        <Link to="/dashboard" className={`menu-item ${location.pathname === '/dashboard' ? 'active' : ''}`}>
           <DashboardOutlined className="icon" />
           <span className="menu-text">Dashboard</span>
         </Link>
-        <Link to="/AddMachine" className={`menu-item ${location.pathname === '/machines' ? 'active' : ''}`}>
+
+        <Link to="/dashboard/addmachine" className={`menu-item ${location.pathname === '/dashboard/addmachine' ? 'active' : ''}`}>
           <ToolOutlined className="icon" />
           <span className="menu-text">Machines</span>
         </Link>
-        <Link to="/Report" className={`menu-item ${location.pathname === '/reports' ? 'active' : ''}`}>
+
+        <Link to="/dashboard/report" className={`menu-item ${location.pathname === '/dashboard/report' ? 'active' : ''}`}>
           <ThunderboltOutlined className="icon" />
           <span className="menu-text">Reports</span>
         </Link>
