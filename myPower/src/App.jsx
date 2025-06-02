@@ -3,20 +3,27 @@ import Layout from './MainLayout/Layout';
 import Dashboard from './Pages/Dashboard';
 import AddMachine from './Pages/AddMachine';
 import Report from './Pages/Report';
-
+import Login from './Login';
 import AdminDashboard from './Pages/Admindashboard';
+import ForgotPassword from './Pages/ForgotPassword';
+import VerifyOTP from './Pages/VerifyOTP';
+import ResetPassword from './Pages/ResetPassword';
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Login />}> */}
-        <Route path='/' element={<AdminDashboard/>}></Route>
+        
+         <Route path="/" element={<Login />}/>
+         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/verify-otp" element={<VerifyOTP />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path='/admin-dashboard' element={<AdminDashboard/>}></Route>
           <Route path="dashboard" element={<Layout />}> 
           <Route index element={<Dashboard />} />
           <Route path="addmachine" element={<AddMachine />} />
           <Route path="report" element={<Report />} />
-        </Route> 
+        </Route>
       </Routes>
     </Router>
   )
