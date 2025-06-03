@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const loadUserData = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/auth/users");
+        const response = await fetch("http://150.242.201.153:4000/api/auth/users");
         const data = await response.json();
         setUserData(data);
       } catch (error) {
@@ -34,14 +34,14 @@ const AdminDashboard = () => {
  const handleModalOk = async () => {
   try {
     const values = await form.validateFields();
-    await fetch("http://localhost:3001/api/auth/register", {
+    await fetch("http://150.242.201.153:4000/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(values),
     });
 
     // ✅ Re-fetch users after successful addition
-    const response = await fetch("http://localhost:3001/api/auth/users");
+    const response = await fetch("http://150.242.201.153:4000/api/auth/users");
     const data = await response.json();
     setUserData(data);
 

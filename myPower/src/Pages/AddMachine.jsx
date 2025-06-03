@@ -1,55 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
 import { Button, Switch, message } from "antd";
 import { SearchOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import "./addmachine.css";
+import { jwtDecode } from "jwt-decode";
 
-// Base URL for your API
-const BASE_URL = "http://localhost:3001/machineroute";
-
-// Get auth headers from localStorage
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  };
-};
-
-// API calls using Axios
-const fetchMachines = async () => {
-  const response = await axios.get(BASE_URL, getAuthHeaders());
-  return response.data;
-};
-
-const addMachineAPI = async (machineData) => {
-  try {
-    const token = localStorage.getItem('token');
-    const payload = jwt.decode(token); // Decode the token to get userId
-    const response = await axios.post(
-      `${BASE_URL}/post`,
-      { ...machineData, created_by: payload.userId },
-      getAuthHeaders()
-    );
-    return response.data;
-  } catch (error) {
-    throw new Error(error.response?.data?.error || 'Failed to add machine');
-  }
-};
-
-const deleteMachineAPI = async (id) => {
-  await axios.delete(`${BASE_URL}/${id}`, getAuthHeaders());
-};
-
-const updateMachineAPI = async (id, machineData) => {
-  const response = await axios.put(`${BASE_URL}/${id}`, machineData, getAuthHeaders());
-  return response.data;
-};
-
-// Main component
 const AddMachine = () => {
   const [machines, setMachines] = useState([]);
   const [name, setName] = useState("");
@@ -63,9 +18,15 @@ const AddMachine = () => {
   }, []);
 
   const loadMachines = async () => {
+    const token = localStorage.getItem("token");
     try {
-      const data = await fetchMachines();
-      setMachines(data);
+      const response = await axios.get("http://150.242.201.153:4000/machineroute", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMachines(response.data);
     } catch (error) {
       message.error("Error loading machines");
     }
@@ -74,18 +35,31 @@ const AddMachine = () => {
   const handleSave = async () => {
     if (name.trim() === "") return;
 
+    const token = localStorage.getItem("token");
+    const payload = jwtDecode(token);
+
     const newMachine = {
       machine_name: name,
+      created_by: payload.userId,
     };
 
     try {
-      const saved = await addMachineAPI(newMachine);
-      setMachines([...machines, saved]);
+      const response = await axios.post(
+        "http://150.242.201.153:4000/machineroute/post",
+        newMachine,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMachines([...machines, response.data]);
       setName("");
       setShowAddForm(false);
       message.success("Machine added successfully");
     } catch (error) {
-      message.error(error.message);
+      message.error(error.response?.data?.error || "Failed to add machine");
     }
   };
 
@@ -99,15 +73,26 @@ const AddMachine = () => {
   const handleEditSave = async () => {
     if (!editMachine || name.trim() === "") return;
 
+    const token = localStorage.getItem("token");
     const updatedMachine = {
       machine_name: name,
       status: editMachine.status ?? true,
     };
 
     try {
-      const updated = await updateMachineAPI(editMachine.id, updatedMachine);
+      const response = await axios.put(
+        `http://150.242.201.153:4000/machineroute/put/${editMachine.id}`,
+        updatedMachine,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       const updatedList = machines.map((m) =>
-        m.id === editMachine.id ? { ...m, ...updated } : m
+        m.id === editMachine.id ? { ...m, ...response.data } : m
       );
       setMachines(updatedList);
       setEditMachine(null);
@@ -122,8 +107,16 @@ const AddMachine = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this machine?")) return;
 
+    const token = localStorage.getItem("token");
     try {
-      await deleteMachineAPI(id);
+      await axios.delete(`http://150.242.201.153:4000/machineroute/del/${id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       setMachines(machines.filter((m) => m.id !== id));
       message.success("Machine deleted successfully");
     } catch (error) {
@@ -169,12 +162,8 @@ const AddMachine = () => {
               onChange={(e) => setName(e.target.value)}
             />
             <div className="form-buttons">
-              <Button onClick={handleCancel} className="cancel">
-                Cancel
-              </Button>
-              <Button type="primary" onClick={handleSave}>
-                Save
-              </Button>
+              <Button onClick={handleCancel} className="cancel">Cancel</Button>
+              <Button type="primary" onClick={handleSave}>Save</Button>
             </div>
           </div>
         </div>
@@ -193,9 +182,7 @@ const AddMachine = () => {
             />
             <div className="form-buttons-edit">
               <Button onClick={handleCancel}>Cancel</Button>
-              <Button type="primary" onClick={handleEditSave}>
-                Update
-              </Button>
+              <Button type="primary" onClick={handleEditSave}>Update</Button>
             </div>
           </div>
         </div>
@@ -218,16 +205,8 @@ const AddMachine = () => {
                 <td>{machine.machine_name}</td>
                 <td>{machine.status ? "Active" : "Inactive"}</td>
                 <td className="action-buttons">
-                  <Button
-                    type="text"
-                    icon={<EditOutlined />}
-                    onClick={() => handleEditClick(machine)}
-                  />
-                  <Button
-                    type="text"
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleDelete(machine.id)}
-                  />
+                  <Button type="text" icon={<EditOutlined />} onClick={() => handleEditClick(machine)} />
+                  <Button type="text" icon={<DeleteOutlined />} onClick={() => handleDelete(machine.id)} />
                 </td>
               </tr>
             ))}
@@ -241,12 +220,8 @@ const AddMachine = () => {
               <hr />
               <p>Status: {machine.status ? "Active" : "Inactive"}</p>
               <div className="action-buttons-card">
-                <Button className="edit" onClick={() => handleEditClick(machine)}>
-                  Edit
-                </Button>
-                <Button className="delete" onClick={() => handleDelete(machine.id)}>
-                  Delete
-                </Button>
+                <Button className="edit" onClick={() => handleEditClick(machine)}>Edit</Button>
+                <Button className="delete" onClick={() => handleDelete(machine.id)}>Delete</Button>
               </div>
             </div>
           ))}

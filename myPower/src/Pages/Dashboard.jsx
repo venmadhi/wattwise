@@ -7,8 +7,11 @@ import axios from 'axios';
 
 const Dashboard = () => {
   const [groupBy, setGroupBy] = useState('day');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  // Initialize startDate and endDate with today in YYYY-MM-DD format
+  const todayISO = new Date().toISOString().split('T')[0];
+  const [startDate, setStartDate] = useState(todayISO);
+  const [endDate, setEndDate] = useState(todayISO);
+
   const [chartData, setChartData] = useState({ labels: [], powerData: [] });
   const [summary, setSummary] = useState({ totalPower: 0, entryCount: 0, usageTimeInHours: 0 });
   const [todayVsYesterday, setTodayVsYesterday] = useState({
@@ -36,7 +39,7 @@ const Dashboard = () => {
       };
 
       const token = localStorage.getItem('token');
-      const { data: responseData } = await axios.get('http://localhost:3001/chartroute/data', {
+      const { data: responseData } = await axios.get('http://150.242.201.153:4000/chartroute/data', {
         params,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,9 +50,10 @@ const Dashboard = () => {
       const powerData = responseData.data.map(item => parseFloat(item.total));
       const totalPower = powerData.reduce((sum, val) => sum + val, 0);
       const entryCount = responseData.data.length;
-      const usageTimeInHours = startDate && endDate && !isNaN(new Date(endDate) - new Date(startDate))
-        ? (new Date(endDate) - new Date(startDate)) / 1000 / 3600
-        : 0;
+      const usageTimeInHours =
+        startDate && endDate && !isNaN(new Date(endDate) - new Date(startDate))
+          ? (new Date(endDate) - new Date(startDate)) / 1000 / 3600
+          : 0;
 
       setChartData({ labels, powerData });
       setSummary({ totalPower, entryCount, usageTimeInHours });
@@ -75,11 +79,11 @@ const Dashboard = () => {
 
       const token = localStorage.getItem('token');
       const [todayRes, yesterdayRes] = await Promise.all([
-        axios.get('http://localhost:3001/chartroute/data', {
+        axios.get('http://150.242.201.153:4000/chartroute/data', {
           params: { startDate: todayStr, endDate: todayEndStr, groupBy: 'day' },
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get('http://localhost:3001/chartroute/data', {
+        axios.get('http://150.242.201.153:4000/chartroute/data', {
           params: { startDate: yesterdayStr, endDate: yesterdayEndStr, groupBy: 'day' },
           headers: { Authorization: `Bearer ${token}` },
         }),
@@ -152,17 +156,21 @@ const Dashboard = () => {
                 <div className="large-card" id="card">
                   <h3 className="card-title">Power Consumption (Bar Chart)</h3>
                   <BarChart
-                    xAxis={[{
-                      scaleType: 'band',
-                      data: chartData.labels,
-                      tickLabelStyle: { fill: '#ffffff' },
-                    }]}
+                    xAxis={[
+                      {
+                        scaleType: 'band',
+                        data: chartData.labels,
+                        tickLabelStyle: { fill: '#ffffff' },
+                      },
+                    ]}
                     yAxis={[{ tickLabelStyle: { fill: '#ffffff' } }]}
-                    series={[{
-                      data: chartData.powerData,
-                      label: 'Power (kWh)',
-                      color: '#1976d2',
-                    }]}
+                    series={[
+                      {
+                        data: chartData.powerData,
+                        label: 'Power (kWh)',
+                        color: '#1976d2',
+                      },
+                    ]}
                     width={400}
                     height={250}
                   />
@@ -171,17 +179,21 @@ const Dashboard = () => {
                 <div className="large-card" id="card">
                   <h3 className="card-title">Power Over Time (Line Chart)</h3>
                   <LineChart
-                    xAxis={[{
-                      scaleType: 'band',
-                      data: chartData.labels,
-                      tickLabelStyle: { fill: '#ffffff' },
-                    }]}
+                    xAxis={[
+                      {
+                        scaleType: 'band',
+                        data: chartData.labels,
+                        tickLabelStyle: { fill: '#ffffff' },
+                      },
+                    ]}
                     yAxis={[{ tickLabelStyle: { fill: '#ffffff' } }]}
-                    series={[{
-                      data: chartData.powerData,
-                      label: 'Power (kWh)',
-                      color: '#0077cc',
-                    }]}
+                    series={[
+                      {
+                        data: chartData.powerData,
+                        label: 'Power (kWh)',
+                        color: '#0077cc',
+                      },
+                    ]}
                     width={400}
                     height={250}
                   />

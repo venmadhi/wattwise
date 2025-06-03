@@ -32,7 +32,7 @@ const Report = () => {
     const fetchMachines = async () => {
       setLoadingMachines(true);
       try {
-        const response = await fetch('http://localhost:3001/machineroute/', getAuthHeaders());
+        const response = await fetch('http://150.242.201.153:4000/machineroute/', getAuthHeaders());
         if (!response.ok) throw new Error('Failed to fetch machines');
         const data = await response.json();
 
@@ -77,18 +77,18 @@ const Report = () => {
         let url = '';
 
         if (searchQuery) {
-          url = `http://localhost:3001/machinedataroute/getbyname/${encodeURIComponent(searchQuery)}`;
+          url = `http://150.242.201.153:4000/machinedataroute/getbyname/${encodeURIComponent(searchQuery)}`;
         } else if (selectedAppliance && machineName) {
           if (fromDate || toDate) {
-            url = 'http://localhost:3001/machinedataroute/bydate';
+            url = 'http://150.242.201.153:4000/machinedataroute/bydate';
             queryParams.append('machineName', machineName);
           } else {
-            url = `http://localhost:3001/machinedataroute/getbyname/${encodeURIComponent(machineName)}`;
+            url = `http://150.242.201.153:4000/machinedataroute/getbyname/${encodeURIComponent(machineName)}`;
           }
         } else {
           url = fromDate || toDate
-            ? 'http://localhost:3001/machinedataroute/bydate'
-            : 'http://localhost:3001/machinedataroute/';
+            ? 'http://150.242.201.153:4000/machinedataroute/bydate'
+            : 'http://150.242.201.153:4000/machinedataroute/';
         }
 
         const fullUrl = queryParams.toString()

@@ -19,6 +19,7 @@
     "@tailwindcss/vite": "^4.1.7",
     "antd": "^5.25.2",
     "axios": "^1.9.0",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

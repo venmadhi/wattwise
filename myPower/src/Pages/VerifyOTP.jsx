@@ -11,7 +11,7 @@ const VerifyOtp = () => {
     const token = localStorage.getItem('resetToken');
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/verify-otp', {
+      const response = await fetch('http://150.242.201.153:4000/api/auth/verify-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, otp })
