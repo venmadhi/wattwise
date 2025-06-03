@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+
 import { Button, Switch, message } from "antd";
 import { SearchOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import "./addmachine.css";
@@ -26,10 +27,16 @@ const fetchMachines = async () => {
 
 const addMachineAPI = async (machineData) => {
   try {
-    const response = await axios.post(`${BASE_URL}/post`, machineData, getAuthHeaders());
+    const token = localStorage.getItem('token');
+    const payload = jwt.decode(token); // Decode the token to get userId
+    const response = await axios.post(
+      `${BASE_URL}/post`,
+      { ...machineData, created_by: payload.userId },
+      getAuthHeaders()
+    );
     return response.data;
   } catch (error) {
-    throw new Error(error.response?.data?.error || "Failed to add machine");
+    throw new Error(error.response?.data?.error || 'Failed to add machine');
   }
 };
 
